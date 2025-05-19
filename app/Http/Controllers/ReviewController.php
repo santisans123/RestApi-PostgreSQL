@@ -8,11 +8,27 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
+
     public function index($itemId)
     {
         $item = Item::findOrFail($itemId);
         return $item->reviews()->with('user:id,name')->get();
     }
+
+    public function getAllReviews(Request $request)
+    {
+        $limit = $request->input('limit', 10); // default: 10 data per halaman
+
+        $reviews = Review::with(['user:id,name,email', 'item:id,name'])
+            ->orderBy('created_at', 'desc')
+            ->paginate($limit);
+
+        return response()->json([
+            'message' => 'List of all reviews',
+            'data' => $reviews
+        ]);
+    }
+
 
     public function store(Request $request, $itemId)
     {

@@ -58,5 +58,19 @@ class ItemController extends Controller
 
         return response()->json(['message' => 'Item deleted']);
     }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $limit = $request->input('limit', 10); // default 10 data per halaman
+
+        $items = Item::where('name', 'ILIKE', "%{$query}%")
+            ->orWhere('description', 'ILIKE', "%{$query}%")
+            ->with('user:id,name,email')
+            ->paginate($limit); // << ini akan otomatis kasih info halaman
+
+        return response()->json($items);
+    }
+
 }
 
